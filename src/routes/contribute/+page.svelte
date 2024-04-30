@@ -5,8 +5,8 @@
 </script>
 
 <h1>Shnail - share your inspection reports with other homebuyers</h1>
-Address: <input /> <br>
-Inspection results: <br>
-<textarea>This house was...</textarea> <br>
-<input type='file' multiple="multiple"/>
-<br> <button on:click={submitEntry}>Submit</button>
+<form method='POST'>
+    <label>Address:<input name='address' /></label> <br>
+    <label>Inspection results:<textarea name='comment' /></label> <br>
+    <label>Update your inspection reports:<input name='attachments' type='file' multiple="multiple"/></label>
+</form>
