@@ -19,6 +19,12 @@ export function getPropertyList() {
     return db;
 }
 
+export function findPropertyByAddress(address) {
+    const addressLowerCase = address.toLowerCase();
+    const properties = [...db.values()].filter((dbentry) => dbentry.address.toLowerCase().includes(addressLowerCase));
+    return properties;
+}
+
 export function addComment(entry) {
     let property = [...db.values()].find(dbentry => dbentry.address === entry.address);
     let propertyId;
