@@ -7,6 +7,9 @@
 
 <ul>
     {#each data.property.uploads as upload}
-    <li>{upload.comment}</li>
+    <li>
+        {#each upload.reports as report} <p>{report}</p> {/each}
+        {upload.comment}
+    </li>
     {/each}
 </ul>

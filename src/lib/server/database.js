@@ -12,7 +12,7 @@ properties.forEach(property => {
         fullAddress: `${property.address}, ${property.city}, ${property.state} ${property.zipcode}`,
         uploads: [
             {
-                report: [],
+                reports: [],
                 comment: random_comments[Math.floor(Math.random() * random_comments.length)]
             }
         ]
@@ -60,7 +60,7 @@ export function getOrAddPropertyIdByAddress({ address, city, state, zipcode }) {
 export function addEntry(entry) {
     const propertyId = getOrAddPropertyIdByAddress(entry);
     const property = db.get(propertyId);
-    property.uploads.push({report: entry.report, comment: entry.comment});
+    property.uploads.push({reports: entry.reports, comment: entry.comment});
     db.set(propertyId, property);
     console.log("db adding success");
 }
