@@ -1,10 +1,11 @@
 <script>
-    function submitEntry() {
-        console.log("placeholder for submitEntry");
-    }
-
     const states = ["TX", "CA", ""];
+    const disableButton = () => {
+        document.getElementById('submit-btn').prop('disabled', true);
+    };
 </script>
+
+<!-- TODO: check out the example here: https://github.com/vercel/examples/tree/main/storage/blob-sveltekit -->
 
 <p>Share your inspection results with other homebuyers!</p>
 <form method="POST" action="?/upload" enctype="multipart/form-data">
@@ -30,7 +31,7 @@
         <label>Other comments: <br /><textarea name="comment" /></label>
     </div>
     <div class="form-section">
-        <button class="form-section">Submit</button>
+        <button class="form-section" id="submit-btn" on:click={disableButton}>Submit</button>
     </div>
 </form>
 
@@ -61,5 +62,10 @@
     }
     form button:hover {
         background-color: lightseagreen;
+    }
+    form button:disabled {
+        cursor:not-allowed;
+        background-color: lightgrey;
+        color: grey;
     }
 </style>

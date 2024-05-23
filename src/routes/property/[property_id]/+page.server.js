@@ -6,6 +6,6 @@ export function load({params}) {
     console.log("On [property_id] page load. Params:", params, "Property", property);
     if (!property) throw error(404);
     return {
-        property
+        property: property,
     };
 }
