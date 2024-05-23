@@ -52,11 +52,14 @@
     form button {
         border: none;
         padding: 0.5em;
-        background-color: lightsalmon;
+        background-color: lightblue;
         cursor: pointer;
-        color: brown;
+        color: darkslategrey;
+        border-radius: 2px;
+        transition-duration: 0.4s;
+        /* box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19); */
     }
     form button:hover {
-        background-color: Salmon;
+        background-color: lightseagreen;
     }
 </style>

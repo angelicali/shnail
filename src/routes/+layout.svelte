@@ -71,6 +71,7 @@
         padding: .6em;
         text-decoration: none;
         font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        transition-duration: 0.4s;
     }
     .nav-block.active {
         /* background-color: skyblue; */
