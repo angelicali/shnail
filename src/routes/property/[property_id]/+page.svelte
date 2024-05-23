@@ -3,10 +3,10 @@
     console.log(`property page data: ${data}`);
 </script>
 
-<p>{data.property.address}</p>
+<p>{data.property.fullAddress}</p>
 
 <ul>
-    {#each data.property.comments as comment}
-    <li>{comment}</li>
+    {#each data.property.uploads as upload}
+    <li>{upload.comment}</li>
     {/each}
 </ul>

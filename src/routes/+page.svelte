@@ -10,7 +10,7 @@
 
 <p>Recently shared by other homebuyers:</p>
 <ul>
-    {#each data.addresses as { id, address }}
+    {#each data.addresses as { id, address}}
         <li><a href="/property/{id}">{address}</a></li>
     {/each}
 </ul>

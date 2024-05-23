@@ -36,9 +36,7 @@
 </div>
 
 
-
 <style>
-    /* TODO: make this shared across all pages */
     * {
         box-sizing: border-box;
     }

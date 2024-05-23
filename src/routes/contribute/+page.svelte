@@ -9,7 +9,7 @@
 <p>Share your inspection results with other homebuyers!</p>
 <form method="POST" action="?/upload" enctype="multipart/form-data">
     <div class="form-section">
-        <label>Street: <input name="address-street" /></label>
+        <label>Address: <input name="address-street" /></label>
         <label>City: <input name="address-city" /></label>
         <label
             >State: <select name="address-state">
@@ -18,12 +18,12 @@
                 {/each}
             </select></label
         >
-        <label>Zip code: <input name="address-zip" /></label>
+        <label>Zip code: <input name="address-zipcode" /></label>
     </div>
     <div class="form-section">
         <label>
             Inspection reports:
-            <input name="report" type="file" multiple="multiple" />
+            <input name="report" id="report-file" type="file" multiple="multiple" accept=".pdf"/>
         </label>
     </div>
     <div class="form-section">

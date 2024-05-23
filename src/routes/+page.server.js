@@ -6,7 +6,7 @@ export function load() {
     return {
         addresses: [...properties.values()].map((property) => ({
             id: property.id,
-            address: property.address
+            address: property.fullAddress
         }))
     }
 }
