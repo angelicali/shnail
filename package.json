@@ -9,6 +9,7 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
+		"@sveltejs/adapter-vercel": "^5.3.1",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"svelte": "^4.2.7",
@@ -16,6 +17,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@vercel/blob": "^0.23.3"
+		"@vercel/blob": "^0.23.3",
+		"@vercel/postgres": "^0.8.0"
 	}
 }

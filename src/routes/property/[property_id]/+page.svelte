@@ -1,17 +1,29 @@
 <script>
     export let data;
-    console.log(`property page data: ${data}`);
+    $: console.log(data);
 </script>
 
-<p>{data.property.fullAddress}</p>
+<p>{data.property?.full_address}</p>
 
 <ul>
-    {#each data.property.uploads as upload}
+    {#each data.property?.reports as report}
         <li>
-            {#each upload.reports as report}
-                <p><a href={report}>View report here</a></p>
-            {/each}
-            {upload.comment}
+            <p class="upload-time">Uploaded on {report.ts}</p>
+            <iframe src={report.report_url} title="inspection report"></iframe>
         </li>
     {/each}
 </ul>
+
+<style>
+    li {
+        list-style-type: none;
+    }
+    p.upload-time {
+        margin-bottom: 0;
+        color: grey;
+    }
+    iframe {
+        width: 100%;
+        aspect-ratio: 1.294;
+    }
+</style>

@@ -2,16 +2,10 @@
     export let data;
 </script>
 
-
-<!-- <form action="/search">
-    <label>Look up an address: <input name="q" /> </label> <button aria-label="Search" />  {searchErrorMsg}
-</form> -->
-
-
 <p>Recently shared by other homebuyers:</p>
 <ul>
-    {#each data.addresses as { id, address}}
-        <li><a href="/property/{id}">{address}</a></li>
+    {#each data.addresses as { address_id, full_address}}
+        <li><a data-sveltekit-preload-data="tap" href="/property/{address_id}" target="_self">{full_address}</a></li>
     {/each}
 </ul>
 
