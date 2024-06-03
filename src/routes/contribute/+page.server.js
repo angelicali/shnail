@@ -19,8 +19,9 @@ export const actions = {
         }
 
         // TODO: upload more than first file
-        const url = await db.uploadBlob(form.get('report'));
-        formSubmission.reports.push(url);
+        // const url = await db.uploadBlob(form.get('report'));
+        const urls = await db.uploadBlobBatch(form.getAll('report'));
+        formSubmission.reports = urls;
         const result = await db.addEntryToPostgres(formSubmission);
         console.log(result);
         if (result.success) {

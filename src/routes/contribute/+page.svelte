@@ -15,10 +15,11 @@
 
 
     function handleFileUpload(files) {
+        const newFileUrls = [];
         [...files].forEach((file, i) => {
             const objectURL = URL.createObjectURL(file);
-            fileUrls.push({url: objectURL, title: file.name});
-            fileUrls = fileUrls;
+            newFileUrls.push({url: objectURL, title: file.name});
+            fileUrls = newFileUrls;
         });
     }
 

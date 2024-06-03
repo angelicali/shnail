@@ -46,6 +46,19 @@ export async function uploadBlob(file) {
     return url;
 }
 
+export async function uploadBlobBatch(files) {
+    const urls = [];
+    await Promise.all(files.map(async (file) => {
+        const {url} = await put(file.name, file, {
+            access: 'public',
+            token: BLOB_READ_WRITE_TOKEN
+        });
+        console.log(`file uploaded to blob: ${url}`);
+        urls.push(url);
+      }));
+    return urls;
+}
+
 export async function addEntryToPostgres(formSubmission) {
     console.log('Adding entry to postgres');
     let { address, city, state, zipcode, reports, email } = formSubmission;
@@ -81,11 +94,13 @@ export async function addEntryToPostgres(formSubmission) {
         }
 
         // Now that we have the address_id, we can insert the upload record.
-        console.log(`Adding uploads entry for address_id ${matchedAddressId} and report_url ${reports[0]}`);
-        queryResult = await client.sql`
-                INSERT INTO uploads (report_url, ts, email, address_id)
-                VALUES (${reports[0]}, CURRENT_TIMESTAMP, ${email}, ${matchedAddressId})`;
-        console.log(`Query result for inserting into uploads`, queryResult);
+        console.log(`Adding uploads entry for address_id ${matchedAddressId} and report_url `, reports);
+        await Promise.all(reports.map( async (report) => {
+            await client.sql`
+            INSERT INTO uploads (report_url, ts, email, address_id)
+                VALUES (${report}, CURRENT_TIMESTAMP, ${email}, ${matchedAddressId})`;
+        }));
+        console.log(`inserting into uploads complete`);
     } catch (error) {
         console.error(error);
         return error;
