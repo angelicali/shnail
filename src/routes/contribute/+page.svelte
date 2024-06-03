@@ -8,11 +8,8 @@
 </script>
 
 <script>
-    export let form;
-    $: {
-        console.log("component prop `form` updated:");
-        console.log(form);
-    }
+    import { enhance } from '$app/forms';
+    let submitting = false;
     // https://vercel.com/guides/using-sveltekit-form-actions
     let fileUrls = [];
 
@@ -68,9 +65,19 @@
 </script>
 
 <!-- TODO: check out the example here: https://github.com/vercel/examples/tree/main/storage/blob-sveltekit -->
-
+{#if submitting}
+<div id="uploading-screen">
+    Uploading....
+  </div>
+{/if}
 <p>Share your inspection results with other homebuyers!</p>
-<form method="POST" action="?/upload" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data" use:enhance={()=>{
+    submitting = true;
+    return async ({update})=>{
+        await update();
+        submitting = false;
+    }
+}}>
     <!-- TODO: add email optional -->
     <div class="form-section">
         <label>Address: <input name="address-street" required /></label>
@@ -105,18 +112,17 @@
         >
             Or drop files here!
         </div> -->
+        <output class="form-section" id="preview">
+            {#each fileUrls as {url, title}}
+            <iframe class='pdf-preview' src={url} {title} on:load={(e)=>{console.log(`revoking ${url}`); URL.revokeObjectURL(url);}} />
+            {/each}
+        </output>
     </div>
 
-    <div class="form-section" id="preview">
-        {#each fileUrls as {url, title}}
-        <iframe class='pdf-preview' src={url} {title} on:load={(e)=>{console.log(`revoking ${url}`); URL.revokeObjectURL(url);}} />
-        {/each}
-    </div>
+    
 
     <div class="form-section">
-        <button class="form-section" id="submit-btn"
-            >Upload</button
-        >
+        <button class="form-section" id="submit-btn"  disabled={submitting}> Upload </button>
     </div>
 </form>
 
@@ -173,5 +179,19 @@
         margin: auto;
         aspect-ratio: 1.294;
         border: none;
+    }
+    #uploading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black overlay */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999; /* Ensure it's above other content */
+        color: white;
+        text-shadow:0.1em;
     }
 </style>

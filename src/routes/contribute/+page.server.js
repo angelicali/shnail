@@ -1,8 +1,8 @@
 import * as db from '$lib/server/database.js';
-import {json} from '@sveltejs/kit';
+import {json, fail, redirect} from '@sveltejs/kit';
 
 export const actions = {
-    upload: async ({cookies, request}) => {
+    default: async ({cookies, request}) => {
         const form = await request.formData();
 
         const formSubmission = {
@@ -21,8 +21,12 @@ export const actions = {
         // TODO: upload more than first file
         const url = await db.uploadBlob(form.get('report'));
         formSubmission.reports.push(url);
-        const result = db.addEntryToPostgres(formSubmission);
+        const result = await db.addEntryToPostgres(formSubmission);
         console.log(result);
-        return;      
+        if (result.success) {
+            redirect(302, `/property/${result.address_id}`);
+        } else {
+            return fail(400, {});
+        }
     }
 }
