@@ -39,8 +39,6 @@ export async function searchProperty(query) {
 
 
 export async function uploadBlob(file) {
-    // console.log('pretending to upload blob');
-    // return '1sgh43tneg9';
     const { url } = await put(file.name, file, {
         access: 'public',
         token: BLOB_READ_WRITE_TOKEN
@@ -50,16 +48,15 @@ export async function uploadBlob(file) {
 
 export async function addEntryToPostgres(formSubmission) {
     console.log('Adding entry to postgres');
-    // return;
     let { address, city, state, zipcode, reports, email } = formSubmission;
     address = address.toUpperCase();
     city = city.toUpperCase();
     const fullAddress = `${address}, ${city}, ${state} ${zipcode}`;
-    let matchedAddressId;
+    let matchedAddressId, queryResult;
     try {
         const client = await db.connect();
         // Check if the address already exists in the addresses table.
-        let matchedAddress = await client.sql`
+        queryResult = await client.sql`
                 SELECT address_id
                 FROM addresses
                 WHERE street_address = ${address}
@@ -67,10 +64,10 @@ export async function addEntryToPostgres(formSubmission) {
                 AND state = ${state}
                 AND zipcode = ${zipcode}`;
                 // FOR UPDATE`; // Lock the row for update to prevent race conditions
-        console.log(matchedAddress);
-        if (matchedAddress.rowCount > 0) {
-            console.log(`found address in database: ${matchedAddress}`);
-            matchedAddressId = matchedAddress[0].address_id;
+        console.log(queryResult);
+        if (queryResult.rowCount > 0) {
+            console.log(`found address in database! Query result:`, queryResult);
+            matchedAddressId = queryResult.rows[0].address_id;
         } else {
             console.log(`will insert address to database`);
             // If address_id is NULL, it means the address doesn't exist. Insert the new address.
@@ -84,10 +81,11 @@ export async function addEntryToPostgres(formSubmission) {
         }
 
         // Now that we have the address_id, we can insert the upload record.
-        await client.sql`
+        console.log(`Adding uploads entry for address_id ${matchedAddressId} and report_url ${reports[0]}`);
+        queryResult = await client.sql`
                 INSERT INTO uploads (report_url, ts, email, address_id)
                 VALUES (${reports[0]}, CURRENT_TIMESTAMP, ${email}, ${matchedAddressId})`;
-
+        console.log(`Query result for inserting into uploads`, queryResult);
     } catch (error) {
         console.error(error);
         return error;

@@ -8,7 +8,7 @@
 <ul>
     {#each data.property?.reports as report}
         <li>
-            <p class="upload-time">Uploaded on {report.ts}</p>
+            <p class="upload-time">Uploaded on {report.ts.toDateString()}</p>
             <iframe src={report.report_url} title="inspection report"></iframe>
         </li>
     {/each}
