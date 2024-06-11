@@ -1,29 +1,84 @@
 <script context="module">
-    const states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", 
-          "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", 
-          "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", 
-          "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", 
-          "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"];
-
+    const states = [
+        "AL",
+        "AK",
+        "AZ",
+        "AR",
+        "CA",
+        "CO",
+        "CT",
+        "DE",
+        "FL",
+        "GA",
+        "HI",
+        "ID",
+        "IL",
+        "IN",
+        "IA",
+        "KS",
+        "KY",
+        "LA",
+        "ME",
+        "MD",
+        "MA",
+        "MI",
+        "MN",
+        "MS",
+        "MO",
+        "MT",
+        "NE",
+        "NV",
+        "NH",
+        "NJ",
+        "NM",
+        "NY",
+        "NC",
+        "ND",
+        "OH",
+        "OK",
+        "OR",
+        "PA",
+        "RI",
+        "SC",
+        "SD",
+        "TN",
+        "TX",
+        "UT",
+        "VT",
+        "VA",
+        "WA",
+        "WV",
+        "WI",
+        "WY",
+    ];
 </script>
 
 <script>
-    import { enhance } from '$app/forms';
-    let submitting = false;
+    import { enhance } from "$app/forms";
+    import { upload } from "@vercel/blob/client";
+    import { error, fail } from "@sveltejs/kit";
+
+    const SubmitStatusCode = {
+        NOT_SUBMITTED: 1,
+        SUBMITTING: 2,
+        ERROR: 3,
+        SUBMITTED: 4,
+    };
+    let submitStatus = SubmitStatusCode.NOT_SUBMITTED;
+    let submitErrorMsg = "";
     // https://vercel.com/guides/using-sveltekit-form-actions
     let fileUrls = [];
 
-
-    function handleFileUpload(files) {
+    function loadFilesforPreview(files) {
         const newFileUrls = [];
         [...files].forEach((file, i) => {
             const objectURL = URL.createObjectURL(file);
-            newFileUrls.push({url: objectURL, title: file.name});
+            newFileUrls.push({ url: objectURL, title: file.name });
             fileUrls = newFileUrls;
         });
     }
 
-    function processFile() {
+    function previewFile() {
         const fileList = this.files;
         console.log(`${fileList.length} file(s) added on client side`);
         if (fileList.length > 0) {
@@ -32,7 +87,7 @@
                 `Added file: ${file.name} | ${file.size} byte | ${file.type}`,
             );
         }
-        handleFileUpload(fileList);
+        loadFilesforPreview(fileList);
     }
 
     // Drag and drop functions
@@ -45,7 +100,7 @@
     //     const dt = e.dataTransfer;
     //     const files = dt.files;
 
-    //     handleFileUpload(files);
+    //     loadFilesforPreview(files);
     // }
 
     // function dragenterHandler(e) {
@@ -66,44 +121,85 @@
 </script>
 
 <!-- TODO: check out the example here: https://github.com/vercel/examples/tree/main/storage/blob-sveltekit -->
-{#if submitting}
-<div id="uploading-screen">
-    Uploading....
-  </div>
+{#if submitStatus === SubmitStatusCode.SUBMITTING}
+    <div class="full-screen">Uploading....</div>
+{:else if submitStatus === SubmitStatusCode.ERROR}
+    <div class="error full-screen">
+        <p>Something went wrong, sorry!</p>
+        <p>{submitErrorMsg}</p>
+    </div>
+{:else if submitStatus === SubmitStatusCode.SUBMITTED}
+    <div class="full-screen">Uploaded successfully! Redirecting...</div>
 {/if}
 <p>Share your inspection results with other homebuyers!</p>
-<form method="POST" enctype="multipart/form-data" use:enhance={()=>{
-    submitting = true;
-    return async ({update})=>{
-        await update();
-        submitting = false;
-    }
-}}>
+<form
+    method="POST"
+    enctype="multipart/form-data"
+    use:enhance={async ({ formData, cancel }) => {
+        submitStatus = SubmitStatusCode.SUBMITTING;
+
+        // Upload blob files
+        const files = document.querySelector("#report-file").files;
+
+        await Promise.all(
+            [...files].map(async (file) => {
+                const { url } = await upload(file.name, file, {
+                    access: "public",
+                    handleUploadUrl: "/api/upload",
+                });
+                return url;
+            }),
+        )
+            .then((urls) => {
+                // If blob uploading succeeds, continue form submission with updated formData.
+                urls.forEach((url) => {
+                    formData.append("blob-url", url);
+                });
+            })
+            .catch((e) => {
+                // If blob uploading fails, cancel submission of form.
+                submitStatus = SubmitStatusCode.ERROR;
+                submitErrorMsg = e.message;
+                console.error(e);
+                cancel();
+                error(e);
+            });
+
+        return async ({ update }) => {
+            await update();
+            submitStatus = SubmitStatusCode.SUBMITTED;
+        };
+    }}
+>
     <!-- TODO: add email optional -->
     <div class="form-section">
         <label>Address: <input name="address-street" required /></label>
         <label>City: <input name="address-city" required /></label>
-        <label
-            >State: <select name="address-state" required>
+        <label>State: <select name="address-state" required>
                 <option disabled selected value>SELECT</option>
                 {#each states as state}
                     <option value={state}>{state}</option>
                 {/each}
             </select></label
         >
-        <label>Zip code: <input name="address-zipcode" required maxlength="5"/></label>
+        <label>Zip code: <input
+                name="address-zipcode"
+                required
+                maxlength="5"
+            /></label
+        >
     </div>
     <div class="form-section">
         <label>Inpsection Report(s):
-        <input
+            <input
                 name="report"
                 id="report-file"
                 type="file"
                 accept=".pdf"
                 multiple
-                on:change={processFile}
+                on:change={previewFile}
             />
-            </label>
+        </label>
         <!-- <div
             id="dropZone"
             on:drop={dropFile}
@@ -114,16 +210,28 @@
             Or drop files here!
         </div> -->
         <output class="form-section" id="preview">
-            {#each fileUrls as {url, title}}
-            <iframe class='pdf-preview' src={url} {title} on:load={(e)=>{console.log(`revoking ${url}`); URL.revokeObjectURL(url);}} />
+            {#each fileUrls as { url, title }}
+                <iframe
+                    class="pdf-preview"
+                    src={url}
+                    {title}
+                    on:load={(e) => {
+                        console.log(`revoking ${url}`);
+                        URL.revokeObjectURL(url);
+                    }}
+                />
             {/each}
         </output>
     </div>
 
-    
-
     <div class="form-section">
-        <button class="form-section" id="submit-btn"  disabled={submitting}> Upload </button>
+        <button
+            class="form-section"
+            id="submit-btn"
+            disabled={submitStatus === SubmitStatusCode.SUBMITTING}
+        >
+            Upload
+        </button>
     </div>
 </form>
 
@@ -141,7 +249,7 @@
     }
     #submit-btn {
         border: 1.5px;
-        border-style:solid;
+        border-style: solid;
         border-color: rgb(36, 74, 108);
         padding: 0.5em;
         background-color: lightblue;
@@ -172,27 +280,34 @@
     } */
     #preview {
         align-items: center;
-        width:100%;
-        
+        width: 100%;
     }
     iframe {
-        width:100%;
+        width: 100%;
         margin: auto;
         aspect-ratio: 1.294;
         border: none;
     }
-    #uploading-screen {
+    .full-screen {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black overlay */
+        background-color: rgba(
+            0,
+            0,
+            0,
+            0.8
+        ); /* Semi-transparent black overlay */
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 9999; /* Ensure it's above other content */
         color: white;
-        text-shadow:0.1em;
+        text-shadow: 0.1em;
+    }
+    .error {
+        color: red;
     }
 </style>

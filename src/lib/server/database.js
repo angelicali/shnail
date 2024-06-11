@@ -1,6 +1,7 @@
 import { db, sql } from '@vercel/postgres';
 import { put } from '@vercel/blob';
 import { BLOB_READ_WRITE_TOKEN } from '$env/static/private';
+import {error} from '@sveltejs/kit';
 
 export async function getAddresses() {
     // TODO: get the most recently modified addresses
@@ -14,16 +15,21 @@ export async function getAddresses() {
 
 export async function getPropertyDetailsById(address_id) {
     const client = await db.connect();
-    let { rows } = await client.sql`
-        SELECT full_address FROM addresses WHERE address_id = ${address_id}`;
-    const fullAddress = rows[0].full_address;
-    ({ rows } = await client.sql`
-        SELECT report_url, ts FROM uploads WHERE address_id = ${address_id}`);
-    // TODO: get uploaded files too
-    return {
-        full_address: fullAddress,
-        reports: rows
-    };
+    try {
+        let { rows } = await client.sql`
+            SELECT full_address FROM addresses WHERE address_id = ${address_id}`;
+        const fullAddress = rows[0].full_address;
+        ({ rows } = await client.sql`
+            SELECT report_urls, ts FROM uploads WHERE address_id = ${address_id}`);
+        return {
+            full_address: fullAddress,
+            uploads: rows
+        };
+    } catch (e) {
+        error(e);
+    } finally {
+        client.release();
+    }
 }
 
 export async function searchProperty(query) {
@@ -49,13 +55,13 @@ export async function uploadBlob(file) {
 export async function uploadBlobBatch(files) {
     const urls = [];
     await Promise.all(files.map(async (file) => {
-        const {url} = await put(file.name, file, {
+        const { url } = await put(file.name, file, {
             access: 'public',
             token: BLOB_READ_WRITE_TOKEN
         });
         console.log(`file uploaded to blob: ${url}`);
         urls.push(url);
-      }));
+    }));
     return urls;
 }
 
@@ -66,8 +72,10 @@ export async function addEntryToPostgres(formSubmission) {
     city = city.toUpperCase();
     const fullAddress = `${address}, ${city}, ${state} ${zipcode}`;
     let matchedAddressId, queryResult;
+    console.log('Connecting to DB');
+    const client = await db.connect();
+    console.log('Connected to DB');
     try {
-        const client = await db.connect();
         // Check if the address already exists in the addresses table.
         queryResult = await client.sql`
                 SELECT address_id
@@ -76,7 +84,7 @@ export async function addEntryToPostgres(formSubmission) {
                 AND city = ${city}
                 AND state = ${state}
                 AND zipcode = ${zipcode}`;
-                // FOR UPDATE`; // Lock the row for update to prevent race conditions
+        // FOR UPDATE`; // Lock the row for update to prevent race conditions
         console.log(queryResult);
         if (queryResult.rowCount > 0) {
             console.log(`found address in database! Query result:`, queryResult);
@@ -94,16 +102,16 @@ export async function addEntryToPostgres(formSubmission) {
         }
 
         // Now that we have the address_id, we can insert the upload record.
-        console.log(`Adding uploads entry for address_id ${matchedAddressId} and report_url `, reports);
-        await Promise.all(reports.map( async (report) => {
-            await client.sql`
-            INSERT INTO uploads (report_url, ts, email, address_id)
-                VALUES (${report}, CURRENT_TIMESTAMP, ${email}, ${matchedAddressId})`;
-        }));
+        console.log(`Adding uploads entry for address_id ${matchedAddressId} and report_urls `, reports);
+        await client.sql`
+            INSERT INTO uploads (report_urls, ts, email, address_id)
+                VALUES (${reports}, CURRENT_TIMESTAMP, ${email}, ${matchedAddressId})`;
         console.log(`inserting into uploads complete`);
     } catch (error) {
         console.error(error);
         return error;
+    } finally {
+        client.release();
     }
     return {
         success: true,

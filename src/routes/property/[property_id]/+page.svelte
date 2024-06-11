@@ -6,10 +6,13 @@
 <p>{data.property?.full_address}</p>
 
 <ul>
-    {#each data.property?.reports as report}
+    {#each data.property?.uploads as upload}
         <li>
-            <p class="upload-time">Uploaded on {report.ts.toDateString()}</p>
-            <iframe src={report.report_url} title="inspection report"></iframe>
+            <p class="upload-time">Uploaded on {upload.ts}</p>
+            <!-- <p class="upload-time">Uploaded on {upload.ts.toDateString()}</p> -->
+            {#each upload.report_urls as url}
+            <iframe src={url} title="inspection report"></iframe>
+            {/each}
         </li>
     {/each}
 </ul>
