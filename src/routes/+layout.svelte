@@ -9,25 +9,14 @@
 </script>
 
 <nav>
-    <ul>
-        <li>
-            <a href="/" class="nav-block button {active_class_home}">
-                Inspection Report Database
-            </a>
-        </li>
-        <li>
-            <a
-                href="/contribute"
-                class="nav-block button {active_class_contribute}">Contribute</a
-            >
-        </li>
-        <li>
-            <form action="/search" class="nav-block search-container">
-                <input name="q" placeholder="Search..." />
-                <button type="submit"><i class="fa fa-search"></i></button>
-            </form>
-        </li>
-    </ul>
+    <a href="/" class="nav-block button {active_class_home}">
+        Inspection Report Database
+    </a>
+    <a href="/contribute" class="nav-block button {active_class_contribute}">Contribute</a>
+    <form action="/search" class="nav-block search-container">
+        <input name="q" placeholder="Search..." />
+        <button type="submit"><i class="fa fa-search"></i></button>
+    </form>
 </nav>
 
 <div class="slot-div">
@@ -35,9 +24,6 @@
 </div>
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
     .search-container button {
         border: none;
         background: none;
@@ -45,37 +31,34 @@
         font-size: 1em;
     }
     .slot-div {
-        /* padding: .8em; */
         font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
             sans-serif;
-        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
     }
-    nav ul {
-        margin: 0;
-        padding: 0em;
-        /* background-color: skyblue; */
-        align-items: center;
-        display: inline;
-    }
-    nav ul li {
-        display: inline-block;
+    nav {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
     }
     .nav-block {
-        border: none;
+        /* border: 5px black solid; */
+        margin: 0.5rem;
         color: rgb(182, 93, 84);
-        font-size: 1.2em;
+        font-size: 1.1rem;
         font-weight: bold;
-        text-align: center;
-        padding: 0.6em;
+        /* text-align: center; */
+        /* padding: 0.6em; */
         text-decoration: none;
         font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
             sans-serif;
         transition-duration: 0.4s;
+        
+        display:flex;
+        justify-content: space-between;
+        align-items: center;
     }
-    .nav-block.search-container {
-        padding-left: 0.6em;
-        padding-top: 0em;
-    }
+
     .nav-block.active {
         /* background-color: skyblue; */
         /* text-decoration: underline; */

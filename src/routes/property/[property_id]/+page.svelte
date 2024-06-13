@@ -3,30 +3,42 @@
     $: console.log(data);
 </script>
 
-<p>{data.property?.full_address}</p>
+<main>
+    <div class="property-address">{data.property?.full_address}</div>
 
-<ul>
     {#each data.property?.uploads as upload}
-        <li>
-            <p class="upload-time">Uploaded on {upload.ts}</p>
-            <!-- <p class="upload-time">Uploaded on {upload.ts.toDateString()}</p> -->
-            {#each upload.report_urls as url}
-            <iframe src={url} title="inspection report"></iframe>
-            {/each}
-        </li>
+        <div class="upload-time">Uploaded on {upload.ts}</div>
+        <!-- <p class="upload-time">Uploaded on {upload.ts.toDateString()}</p> -->
+        {#each upload.report_urls as url}
+        <iframe src={url} title="inspection report"></iframe>
+        <a class="full-screen-link" href={url}>View in fullscreen</a>
+        {/each}
     {/each}
-</ul>
+</main>
 
 <style>
-    li {
-        list-style-type: none;
+    .property-address {
+        background-color: lightsalmon;
+        text-align: center;
+        padding: 0.5rem;
+        margin: 0.5rem 0;
     }
-    p.upload-time {
+    .upload-time {
         margin-bottom: 0;
         color: grey;
+        text-align: center;
     }
     iframe {
+        /* width: 80vw; */
         width: 100%;
+        /* height: 100vh; */
         aspect-ratio: 1.294;
+        resize:both;
+        border: 1px solid black;
+    }
+    .full-screen-link {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 1rem;
     }
 </style>

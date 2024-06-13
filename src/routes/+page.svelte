@@ -2,20 +2,26 @@
     export let data;
 </script>
 
-<p>Recently shared by other homebuyers:</p>
-<ul>
-    {#each data.addresses as { address_id, full_address}}
-        <li><a data-sveltekit-preload-data="tap" href="/property/{address_id}" target="_self">{full_address}</a></li>
+<main>
+    <div class="title">Recently shared by other homebuyers</div>
+    {#each data.addresses as { address_id, full_address }}
+        <div>
+            <a
+                data-sveltekit-preload-data="tap"
+                href="/property/{address_id}"
+                target="_self">{full_address}</a
+            >
+        </div>
     {/each}
-</ul>
+</main>
 
 <style>
     * {
-        font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-        box-sizing: border-box;
+        font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+            sans-serif;
+        /* box-sizing: border-box; */
     }
-    p {
-        margin: 0;
+    .title {
+        margin: 1rem 0;
     }
-
 </style>

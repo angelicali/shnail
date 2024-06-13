@@ -3,13 +3,23 @@
     $: console.log(data);
 </script>
 
-{#if data.searchResults.length>0}
-<p>Matched results for "{data.searchQuery}"</p>
-<ul>
-    {#each data.searchResults as {address_id, full_address}}
-    <li><a href="/property/{address_id}" target="_self">{full_address}</a></li>
-    {/each}
-</ul>
-{:else}
-<p>no results found for "{data.searchQuery}"</p>
-{/if}
+<main>
+    {#if data.searchResults.length > 0}
+        <div class="title">Matched results for "{data.searchQuery}"</div>
+        {#each data.searchResults as { address_id, full_address }}
+            <a href="/property/{address_id}" target="_self">{full_address}</a>
+        {/each}
+    {:else}
+        <p>no results found for "{data.searchQuery}"</p>
+    {/if}
+</main>
+
+<style>
+    .title {
+        margin: 1rem 0;
+    }
+
+    a {
+        display: block;
+    }
+</style>

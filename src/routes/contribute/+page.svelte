@@ -131,66 +131,86 @@
 {:else if submitStatus === SubmitStatusCode.SUBMITTED}
     <div class="full-screen">Uploaded successfully! Redirecting...</div>
 {/if}
-<p>Share your inspection results with other homebuyers!</p>
-<form
-    method="POST"
-    enctype="multipart/form-data"
-    use:enhance={async ({ formData, cancel }) => {
-        submitStatus = SubmitStatusCode.SUBMITTING;
 
-        // Upload blob files
-        const files = document.querySelector("#report-file").files;
+<main>
+    <p>Share your inspection results with other homebuyers!</p>
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+        use:enhance={async ({ formData, cancel }) => {
+            submitStatus = SubmitStatusCode.SUBMITTING;
 
-        await Promise.all(
-            [...files].map(async (file) => {
-                const { url } = await upload(file.name, file, {
-                    access: "public",
-                    handleUploadUrl: "/api/upload",
+            // Upload blob files
+            const files = document.querySelector("#report-file").files;
+
+            await Promise.all(
+                [...files].map(async (file) => {
+                    const { url } = await upload(file.name, file, {
+                        access: "public",
+                        handleUploadUrl: "/api/upload",
+                    });
+                    return url;
+                }),
+            )
+                .then((urls) => {
+                    // If blob uploading succeeds, continue form submission with updated formData.
+                    urls.forEach((url) => {
+                        formData.append("blob-url", url);
+                    });
+                })
+                .catch((e) => {
+                    // If blob uploading fails, cancel submission of form.
+                    submitStatus = SubmitStatusCode.ERROR;
+                    submitErrorMsg = e.message;
+                    console.error(e);
+                    cancel();
+                    error(e);
                 });
-                return url;
-            }),
-        )
-            .then((urls) => {
-                // If blob uploading succeeds, continue form submission with updated formData.
-                urls.forEach((url) => {
-                    formData.append("blob-url", url);
-                });
-            })
-            .catch((e) => {
-                // If blob uploading fails, cancel submission of form.
-                submitStatus = SubmitStatusCode.ERROR;
-                submitErrorMsg = e.message;
-                console.error(e);
-                cancel();
-                error(e);
-            });
 
-        return async ({ update }) => {
-            await update();
-            submitStatus = SubmitStatusCode.SUBMITTED;
-        };
-    }}
->
-    <!-- TODO: add email optional -->
-    <div class="form-section">
-        <label>Address: <input name="address-street" required /></label>
-        <label>City: <input name="address-city" required /></label>
-        <label>State: <select name="address-state" required>
-                <option disabled selected value>SELECT</option>
-                {#each states as state}
-                    <option value={state}>{state}</option>
-                {/each}
-            </select></label
-        >
-        <label>Zip code: <input
-                name="address-zipcode"
-                required
-                maxlength="5"
-            /></label
-        >
-    </div>
-    <div class="form-section">
-        <label>Inpsection Report(s):
+            return async ({ update }) => {
+                await update();
+                submitStatus = SubmitStatusCode.SUBMITTED;
+            };
+        }}
+    >
+        <!-- TODO: add email optional -->
+        <div class="form-section-title">Home inspected</div>
+        <div class="form-section">
+            <div class="form-input">
+                <label for="address-street">Address: </label>
+                <input name="address-street" required />
+            </div>
+
+            <div class="form-input">
+                <label for="address-city">City: </label>
+                <input name="address-city" required />
+            </div>
+
+            <div class="form-input">
+                <label for="address-state">State: </label>
+                <select name="address-state" required>
+                    <option disabled selected value>SELECT</option>
+                    {#each states as state}
+                        <option value={state}>{state}</option>
+                    {/each}
+                </select>
+            </div>
+
+            <div class="form-input">
+                <label for="address-zipcode">Zip code:</label>
+                <input name="address-zipcode" required maxlength="5" />
+            </div>
+        </div>
+
+        <div class="form-section-title">Inpsection results</div>
+
+        <div class="form-section">
+            <label for="comment">Comments:</label>
+            <textarea name="comment"></textarea>
+        </div>
+
+        <div class="form-section">
+            <label for="report">PDF Inpsection Report(s): </label>
             <input
                 name="report"
                 id="report-file"
@@ -199,8 +219,8 @@
                 multiple
                 on:change={previewFile}
             />
-        </label>
-        <!-- <div
+
+            <!-- <div
             id="dropZone"
             on:drop={dropFile}
             on:dragover={dragoverHandler}
@@ -209,58 +229,87 @@
         >
             Or drop files here!
         </div> -->
-        <output class="form-section" id="preview">
-            {#each fileUrls as { url, title }}
-                <iframe
-                    class="pdf-preview"
-                    src={url}
-                    {title}
-                    on:load={(e) => {
-                        console.log(`revoking ${url}`);
-                        URL.revokeObjectURL(url);
-                    }}
-                />
-            {/each}
-        </output>
-    </div>
+            <output class="form-section" id="preview">
+                {#each fileUrls as { url, title }}
+                    <iframe
+                        class="pdf-preview"
+                        src={url}
+                        {title}
+                        on:load={(e) => {
+                            console.log(`revoking ${url}`);
+                            URL.revokeObjectURL(url);
+                        }}
+                    />
+                {/each}
+            </output>
+        </div>
 
-    <div class="form-section">
-        <button
-            class="form-section"
-            id="submit-btn"
-            disabled={submitStatus === SubmitStatusCode.SUBMITTING}
-        >
-            Upload
-        </button>
-    </div>
-</form>
+        <div class="form-section submit">
+            <button
+                id="submit-btn"
+                disabled={submitStatus === SubmitStatusCode.SUBMITTING}
+            >
+                Upload
+            </button>
+        </div>
+    </form>
+</main>
 
 <style>
-    p {
-        margin: 0;
-    }
-    form div label {
-        display: inline-block;
-        margin: 0.2em;
-    }
-    form .form-section {
+    form {
         display: block;
+        /* flex-direction: column; */
+        /* justify-content: flex-start; */
+    }
+
+    form label {
+        display: block;
+    }
+
+
+    form .form-section {
+        /* display: flex; */
         margin: 0.5em;
+        /* justify-content: space-between; */
+    }
+
+    .form-section-title {
+        background-color: lightsalmon;
+        padding: 1%;
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    input {
+        width: 100%;
+        max-width: 300px;
+    }
+    form .form-input {
+        margin: 3px 0 0;
+    }
+
+    .form-section.submit {
+        display:flex;
+        justify-content: center;
+        margin-top: 15px;
     }
     #submit-btn {
-        border: 1.5px;
-        border-style: solid;
-        border-color: rgb(36, 74, 108);
+        border: 1.5px solid black;
         padding: 0.5em;
-        background-color: lightblue;
+        background-color: lightsalmon;
+        box-shadow: 0 8px 3px 0 rgba(0, 0, 0, 0.303);
+
         cursor: pointer;
-        color: darkslategrey;
+        
+        font: 1rem;
+        
+
+        width: 50%;
         border-radius: 2px;
         transition-duration: 0.4s;
-        /* box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19); */
     }
     #submit-btn:hover {
-        background-color: lightseagreen;
+        background-color: rgba(255, 160, 122, 0.405);
     }
     #submit-btn:disabled {
         cursor: not-allowed;
