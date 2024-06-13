@@ -15,10 +15,6 @@
 </main>
 
 <style>
-    .title {
-        margin: 1rem 0;
-    }
-
     a {
         display: block;
     }

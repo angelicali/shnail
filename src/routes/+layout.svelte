@@ -12,7 +12,9 @@
     <a href="/" class="nav-block button {active_class_home}">
         Inspection Report Database
     </a>
-    <a href="/contribute" class="nav-block button {active_class_contribute}">Contribute</a>
+    <a href="/contribute" class="nav-block button {active_class_contribute}"
+        >Contribute</a
+    >
     <form action="/search" class="nav-block search-container">
         <input name="q" placeholder="Search..." />
         <button type="submit"><i class="fa fa-search"></i></button>
@@ -24,6 +26,10 @@
 </div>
 
 <style>
+    :global(.title) {
+        margin: 1rem 0;
+        text-align: center;
+    }
     .search-container button {
         border: none;
         background: none;
@@ -53,8 +59,8 @@
         font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
             sans-serif;
         transition-duration: 0.4s;
-        
-        display:flex;
+
+        display: flex;
         justify-content: space-between;
         align-items: center;
     }

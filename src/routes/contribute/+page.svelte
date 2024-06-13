@@ -133,7 +133,7 @@
 {/if}
 
 <main>
-    <p>Share your inspection results with other homebuyers!</p>
+    <div class="title">Share your inspection results with other homebuyers!</div>
     <form
         method="POST"
         enctype="multipart/form-data"
@@ -211,6 +211,7 @@
 
         <div class="form-section">
             <label for="report">PDF Inpsection Report(s): </label>
+            <small class="privacy-warning">&#9888; For your own privacy, please remove pages with your name before uploading!</small>
             <input
                 name="report"
                 id="report-file"
@@ -282,7 +283,12 @@
 
     input {
         width: 100%;
-        max-width: 300px;
+        max-width: 500px;
+    }
+    textarea {
+        width: 100%;
+        min-height: 70px;
+        max-width: 500px;
     }
     form .form-input {
         margin: 3px 0 0;
@@ -358,5 +364,10 @@
     }
     .error {
         color: red;
+    }
+    .privacy-warning {
+        color: red;
+        font: 0.2rem;
+        display: block;
     }
 </style>

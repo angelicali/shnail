@@ -20,7 +20,8 @@ export async function getPropertyDetailsById(address_id) {
             SELECT full_address FROM addresses WHERE address_id = ${address_id}`;
         const fullAddress = rows[0].full_address;
         ({ rows } = await client.sql`
-            SELECT report_urls, ts FROM uploads WHERE address_id = ${address_id}`);
+            SELECT ts, comment, report_urls FROM uploads WHERE address_id = ${address_id}
+            ORDER BY ts DESC`);
         return {
             full_address: fullAddress,
             uploads: rows
@@ -67,7 +68,7 @@ export async function uploadBlobBatch(files) {
 
 export async function addEntryToPostgres(formSubmission) {
     console.log('Adding entry to postgres');
-    let { address, city, state, zipcode, reports, email } = formSubmission;
+    let { address, city, state, zipcode, reports, email, comment } = formSubmission;
     address = address.toUpperCase();
     city = city.toUpperCase();
     const fullAddress = `${address}, ${city}, ${state} ${zipcode}`;
@@ -104,8 +105,8 @@ export async function addEntryToPostgres(formSubmission) {
         // Now that we have the address_id, we can insert the upload record.
         console.log(`Adding uploads entry for address_id ${matchedAddressId} and report_urls `, reports);
         await client.sql`
-            INSERT INTO uploads (report_urls, ts, email, address_id)
-                VALUES (${reports}, CURRENT_TIMESTAMP, ${email}, ${matchedAddressId})`;
+            INSERT INTO uploads (report_urls, ts, email, address_id, comment)
+                VALUES (${reports}, CURRENT_TIMESTAMP, ${email}, ${matchedAddressId}, ${comment})`;
         console.log(`inserting into uploads complete`);
     } catch (error) {
         console.error(error);

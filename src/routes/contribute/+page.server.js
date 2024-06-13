@@ -10,11 +10,12 @@ export const actions = {
             city: form.get('address-city'),
             state: form.get('address-state'),
             zipcode: form.get('address-zipcode'),
+            comment: form.get('comment'),
             reports: form.getAll('blob-url'),
             email: form.get('email')
         }
-        if (!form.has('blob-url')) {
-            console.error('no blob url!! Will not alter database.');
+        if (!form.has('blob-url') && !form.has('comment')) {
+            console.error('Form has neither blob url nor comment!! Will not alter database.');
             return;
         }
 
