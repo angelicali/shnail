@@ -1,6 +1,9 @@
 <script>
     export let data;
+    import { getContext } from 'svelte';
+
     $: console.log(data);
+    const isMobile = getContext('is-mobile');
 </script>
 
 <main>
@@ -9,18 +12,24 @@
     {#each data.property?.uploads as upload}
         <div class="upload-section">
             <div class="upload-time">
-                Uploaded on {Intl.DateTimeFormat('en-US', {
-                    dateStyle: 'short',
-                    timeStyle: 'short',
-                  }).format(upload.ts)}
+                Uploaded on {Intl.DateTimeFormat("en-US", {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                }).format(upload.ts)}
             </div>
             {#if upload.comment}
                 <div class="comment">{upload.comment}</div>
             {/if}
             <!-- <p class="upload-time">Uploaded on {upload.ts.toDateString()}</p> -->
             {#each upload.report_urls as url}
-                <iframe src={url} title="inspection report"></iframe>
-                <a class="full-screen-link" href={url} target="_blank">View in fullscreen</a>
+                {#if isMobile}
+                    <a class="download-link" href={url}>Download pdf file</a>
+                {:else}
+                    <iframe src={url} title="inspection report"></iframe>
+                    <a class="full-screen-link" href={url} target="_blank"
+                        >View in fullscreen</a
+                    >
+                {/if}
             {/each}
         </div>
     {/each}
@@ -54,5 +63,9 @@
         justify-content: flex-end;
         margin-bottom: 1rem;
         font-size: 0.6rem;
+    }
+    .download-link {
+        display: flex;
+        justify-content: center;
     }
 </style>

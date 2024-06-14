@@ -57,7 +57,9 @@
     import { enhance } from "$app/forms";
     import { upload } from "@vercel/blob/client";
     import { error, fail } from "@sveltejs/kit";
+    import { getContext } from 'svelte';
 
+    const isMobile = getContext('is-mobile');
     const SubmitStatusCode = {
         NOT_SUBMITTED: 1,
         SUBMITTING: 2,
@@ -79,6 +81,7 @@
     }
 
     function previewFile() {
+        if (isMobile) return;
         const fileList = this.files;
         console.log(`${fileList.length} file(s) added on client side`);
         if (fileList.length > 0) {
