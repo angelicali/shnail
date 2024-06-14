@@ -57,11 +57,7 @@
     import { enhance } from "$app/forms";
     import { upload } from "@vercel/blob/client";
     import { error, fail } from "@sveltejs/kit";
-    // import { getContext } from 'svelte';
-    import * as lib from '$lib/index.js';
-    const isMobile = lib.mobileCheck();
 
-    // const isMobile = getContext('is-mobile');
     const SubmitStatusCode = {
         NOT_SUBMITTED: 1,
         SUBMITTING: 2,
@@ -83,7 +79,6 @@
     }
 
     function previewFile() {
-        if (isMobile) return;
         const fileList = this.files;
         console.log(`${fileList.length} file(s) added on client side`);
         if (fileList.length > 0) {
@@ -237,7 +232,7 @@
         </div> -->
             <output class="form-section" id="preview">
                 {#each fileUrls as { url, title }}
-                    <iframe
+                    <embed
                         class="pdf-preview"
                         src={url}
                         {title}
@@ -342,7 +337,7 @@
         align-items: center;
         width: 100%;
     }
-    iframe {
+    embed {
         width: 100%;
         margin: auto;
         aspect-ratio: 1.294;
@@ -374,5 +369,10 @@
         color: red;
         font: 0.2rem;
         display: block;
+    }
+    @media only screen and (max-width: 600px) {
+        #preview {
+            display: none;
+        }
     }
 </style>

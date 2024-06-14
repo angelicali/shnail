@@ -1,23 +1,10 @@
 <script>
     export let data;
     $: console.log(data);
-
-    // export const ssr = false;
-
-    import * as lib from '$lib/index.js';
-    // const isMobile = lib.mobileCheck();
-
-    // import { getContext } from 'svelte';
-    import { onMount } from "svelte";
-    let isMobile;
-    onMount(()=>{
-        isMobile = lib.mobileCheck();
-    })
 </script>
 
 <main>
     <div class="property-address">{data.property?.full_address}</div>
-
     {#each data.property?.uploads as upload}
         <div class="upload-section">
             <div class="upload-time">
@@ -31,14 +18,17 @@
             {/if}
             <!-- <p class="upload-time">Uploaded on {upload.ts.toDateString()}</p> -->
             {#each upload.report_urls as url}
-                {#if isMobile}
-                    <a class="download-link" href={url}>Download pdf file</a>
-                {:else}
-                    <iframe src={url} title="inspection report"></iframe>
-                    <a class="full-screen-link" href={url} target="_blank"
-                        >View in fullscreen</a
-                    >
-                {/if}
+                <embed
+                    class="desktop-only"
+                    src={url}
+                    title="inspection report"
+                />
+                <a
+                    class="full-screen-link desktop-only"
+                    href={url}
+                    target="_blank">View in fullscreen</a
+                >
+                <a class="download-link mobile-only" href={url}>Download pdf file</a>
             {/each}
         </div>
     {/each}
@@ -59,7 +49,7 @@
         color: rgba(128, 128, 128, 0.896);
         text-align: center;
     }
-    iframe {
+    embed {
         width: 700px;
         max-width: 100vw;
         /* width: 100%; */
@@ -77,5 +67,17 @@
     .download-link {
         display: flex;
         justify-content: center;
+    }
+    .mobile-only {
+        display: none;
+    }
+    @media only screen and (max-width: 600px) {
+        .desktop-only {
+            display: none;
+        }
+        .mobile-only {
+            display: block;
+            text-align: center;
+        }
     }
 </style>
