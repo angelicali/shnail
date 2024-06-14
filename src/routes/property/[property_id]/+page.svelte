@@ -2,16 +2,17 @@
     export let data;
     $: console.log(data);
 
-    export const ssr = false;
+    // export const ssr = false;
 
     import * as lib from '$lib/index.js';
-    const isMobile = lib.mobileCheck();
+    // const isMobile = lib.mobileCheck();
 
     // import { getContext } from 'svelte';
-    // import { onMount } from "svelte";
-    // onMount(()=>{
-    //     isMobile = getContext('is-mobile');
-    // })
+    import { onMount } from "svelte";
+    let isMobile;
+    onMount(()=>{
+        isMobile = lib.mobileCheck();
+    })
 </script>
 
 <main>
