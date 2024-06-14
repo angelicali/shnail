@@ -1,9 +1,17 @@
 <script>
     export let data;
-    import { getContext } from 'svelte';
+    import * as lib from '$lib/index.js';
+    const isMobile = lib.mobileCheck();
+
+    // import { getContext } from 'svelte';
+    // import { onMount } from "svelte";
 
     $: console.log(data);
-    const isMobile = getContext('is-mobile');
+
+    
+    // onMount(()=>{
+    //     isMobile = getContext('is-mobile');
+    // })
 </script>
 
 <main>
@@ -51,8 +59,9 @@
         text-align: center;
     }
     iframe {
-        /* width: 80vw; */
-        width: 100%;
+        width: 700px;
+        max-width: 100vw;
+        /* width: 100%; */
         /* height: 100vh; */
         aspect-ratio: 1.294;
         resize: both;

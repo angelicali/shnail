@@ -57,9 +57,11 @@
     import { enhance } from "$app/forms";
     import { upload } from "@vercel/blob/client";
     import { error, fail } from "@sveltejs/kit";
-    import { getContext } from 'svelte';
+    // import { getContext } from 'svelte';
+    import * as lib from '$lib/index.js';
+    const isMobile = lib.mobileCheck();
 
-    const isMobile = getContext('is-mobile');
+    // const isMobile = getContext('is-mobile');
     const SubmitStatusCode = {
         NOT_SUBMITTED: 1,
         SUBMITTING: 2,
